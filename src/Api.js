@@ -22,7 +22,7 @@ class Api {
    * @param {String} options.write - Location to save full query response JSON
    * @returns {Promise}
    */
-  query(adultCount, maxPrice, solutions, origin, destination, date, options = {}) {
+  async query(adultCount, maxPrice, solutions, origin, destination, date, options = {}) {
     const endPoint = `https://www.googleapis.com/qpxExpress/v1/trips/search?key=${this.apikey}`;
 
     const data = {};
@@ -33,17 +33,20 @@ class Api {
     data.request.slice[0].destination = destination;
     data.request.slice[0].date = date;
 
-    return Api._queryPromise(endPoint, query, options);
-  }
-
-  static async _queryPromise(endPoint, data, options) {
-    const response = await request({ method: 'post', url: endPoint, body: data, json: true });
-    const { body } = response;
+    const queryRequest = { method: 'post', url: endPoint, body: data, json: true };
+    const queryResponse = await Api._queryPromise(queryRequest);
 
     const writePath = options.write;
     if (writePath) {
-      fs.writeFileSync(writePath, JSON.stringify({ request: data, response }), 'utf8');
+      fs.writeFileSync(writePath, JSON.stringify({ request: queryRequest, response: queryResponse }), 'utf8');
     }
+
+    return queryResponse;
+  }
+
+  static async _queryPromise(queryRequest) {
+    const response = await request(queryRequest);
+    const { body } = response;
 
     if (body.error) throw(body.error);
 
