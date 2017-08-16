@@ -1,6 +1,6 @@
 {
   "name": "google-flights-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple wrapper for the Google Flights API",
   "main": "build/index.js",
   "repository": {
@@ -34,6 +34,6 @@
   "scripts": {
     "build": "babel src -d build",
     "prepublish": "npm run build",
-    "precommit": "npm run prepublish && git add ."
+    "precommit": "npm run build && git add ."
   }
 }
