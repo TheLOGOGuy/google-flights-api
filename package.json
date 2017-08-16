@@ -1,14 +1,11 @@
 {
-  "name": "google-flights-wrapper",
-  "version": "1.0.4",
+  "name": "google-flights-api",
+  "version": "1.0.0",
   "description": "A simple wrapper for the Google Flights API",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "build/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/adhorrig/google-flights-wrapper.git"
+    "url": "git+https://github.com/danielyaa5/google-flights-api.git"
   },
   "keywords": [
     "api",
@@ -18,13 +15,20 @@
     "airline",
     "flight"
   ],
-  "author": "Adam Horrigan",
+  "author": "Daniel Yakobian",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/adhorrig/google-flights-wrapper/issues"
-  },
-  "homepage": "https://github.com/adhorrig/google-flights-wrapper#readme",
+  "homepage": "https://github.com/danielyaa5/google-flights-api#README",
   "dependencies": {
-    "request": "^2.75.0"
+    "request": "^2.75.0",
+    "request-promise": "^4.2.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-preset-env": "^1.6.0",
+    "husky": "^0.14.3"
+  },
+  "scripts": {
+    "prepublish": "babel src -d build",
+    "precommit": "npm run prepublish && git add ."
   }
 }
