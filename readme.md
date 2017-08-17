@@ -1,9 +1,10 @@
 # Google Flights Api
+Forked from https://github.com/adhorrig/google-flights-wrapper
 
 ## Installation
 
 ```
-npm install google-flights-wrapper
+npm install google-flights-api
 ```
 
 ## Usage

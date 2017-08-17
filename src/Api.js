@@ -17,45 +17,82 @@ class Api {
    * @param {Number} solutions - The number of possible routes the API should return.
    * @param {String} origin - The origin airport code.
    * @param {String} destination - The destination airport code.
-   * @param {String} date - The date of the flight... "2016-12-14"
+   * @param {String} date - The date of the flight... '2016-12-14'
    * @param {Object} options - Optional parameters
    * @param {String} options.write - Location to save full query response JSON
    * @returns {Promise}
    */
   async query(adultCount, maxPrice, solutions, origin, destination, date, options = {}) {
-    const endPoint = `https://www.googleapis.com/qpxExpress/v1/trips/search?key=${this.apikey}`;
+    const url = `https://www.googleapis.com/qpxExpress/v1/trips/search?key=${this.apikey}`;
 
-    const data = {};
-    data.request.passengers.adultCount = adultCount;
-    data.request.maxPrice = maxPrice;
-    data.request.solutions = solutions;
-    data.request.slice[0].origin = origin;
-    data.request.slice[0].destination = destination;
-    data.request.slice[0].date = date;
-
-    const queryRequest = { method: 'post', url: endPoint, body: data, json: true };
-    const queryResponse = await Api._queryPromise(queryRequest);
+    const queryBody = Api._getQueryBody(adultCount, maxPrice, solutions, origin, destination, date);
+    const queryRequest = { method: 'post', url, body: queryBody, json: true };
+    const queryResponseBody = await Api._queryPromise(queryRequest);
+    const queryResponseProcessed = Api._processQueryResponse(queryResponseBody);
 
     const writePath = options.write;
     if (writePath) {
-      fs.writeFileSync(writePath, JSON.stringify({ request: queryRequest, response: queryResponse }), 'utf8');
+      fs.writeFileSync(writePath, JSON.stringify({ request: queryRequest, response: queryResponseProcessed }), 'utf8');
     }
 
-    return queryResponse;
+    return queryResponseProcessed;
   }
 
+
+  /**
+   * Process the query response body to get prettified information
+   * @param {Object} body - The response body from the query request
+   * @returns {Array} flights - The available flights for the query
+   * @private
+   */
+  static _processQueryResponse(body) {
+    const tripOptions = body.trips.tripOption;
+    const flights = tripOptions.map((tripOption) => {
+      const airline = tripOption.slice[0].segment[0].flight.carrier;
+      const price = tripOption.saleTotal;
+      return { airline, price };
+    }) || [];
+
+    return flights;
+  }
+
+  /**
+   * Returns a promise which resolves to the response body
+   * @param {Object} queryRequest - The request object made to the QPX api
+   * @returns {Promise} Promise with query response body
+   * @private
+   */
   static async _queryPromise(queryRequest) {
     const response = await request(queryRequest);
     const { body } = response;
 
     if (body.error) throw(body.error);
 
-    const tripOptions = body.trips.tripOption;
-    return tripOptions.map((tripOption) => {
-      const airline = tripOption.slice[0].segment[0].flight.carrier;
-      const price = tripOption.saleTotal;
-      return { airline, price };
-    });
+    return body;
+  }
+
+  /**
+   * Constructs the body for the QPX query
+   * Refer to Api.query for details about params
+   * @see Api.query
+   * @param {Number} adultCount
+   * @param {String} maxPrice
+   * @param {Number} solutions
+   * @param {String} origin
+   * @param {String} destination
+   * @param {String} date
+   * @private
+   */
+  static _getQueryBody(adultCount, maxPrice, solutions, origin, destination, date) {
+
+    return {
+      request: {
+        passengers: { adultCount },
+        maxPrice,
+        solutions,
+        slice: [ { origin, destination, date } ]
+      }
+    };
   }
 }
 
