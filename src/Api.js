@@ -46,14 +46,14 @@ class Api {
 
   /**
    * Save request and response data to json file for backup purposes
-   * @param {String} path - Path to save file
+   * @param {String} savePath - Path to save file
    * @param {Object} request - Query request
    * @param {Object} response - Query response
    * @private
    */
-  static _saveQueryData(path, request, response) {
+  static _saveQueryData(savePath, request, response) {
     // Save backup req and response as timestamp.json
-    const writePath = path.resolve(path, `${moment().format('MM-DD-YYYY_h:mm:ssa')}.json`);
+    const writePath = path.resolve(savePath, `${moment().format('MM-DD-YYYY_h:mm:ssa')}.json`);
     fs.writeFileSync(writePath, JSON.stringify({ request, response}, null, 2), 'utf8');
   }
 
