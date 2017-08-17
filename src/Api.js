@@ -2,10 +2,18 @@
 
 const fs = require('fs');
 const path = require('path');
+const moment = require('moment');
 const request = require('request-promise');
 
 class Api {
-  constructor(apikey) {
+  /**
+   * @param {String} apikey - QPX api key
+   * @param {Object} options - Optional parameters
+   * @param {String} options.backup - Absolute path for location to save full query response and request in JSON
+   * @param options
+   */
+  constructor(apikey, options = {}) {
+    this.options = options;
     if (!apikey || typeof apikey !== 'string' || apikey.length === 0) {
       throw Error('Api class expects a valid apikey');
     }
@@ -19,35 +27,49 @@ class Api {
    * @param {String} origin - The origin airport code.
    * @param {String} destination - The destination airport code.
    * @param {String} date - The date of the flight... '2016-12-14'
-   * @param {Object} options - Optional parameters
-   * @param {String} options.write - Location to save full query response JSON
    * @returns {Promise}
    */
-  async query(adultCount, maxPrice, solutions, origin, destination, date, options = {}) {
+  async query(adultCount, maxPrice, solutions, origin, destination, date) {
     const url = `https://www.googleapis.com/qpxExpress/v1/trips/search?key=${this.apikey}`;
 
     const queryBody = Api._getQueryBody(adultCount, maxPrice, solutions, origin, destination, date);
     const queryRequest = { method: 'POST', url, body: queryBody, json: true };
-    const queryResponseBody = await Api._queryPromise(queryRequest);
-    const queryResponseProcessed = Api._processQueryResponse(queryResponseBody);
+    const queryResponse = await Api._queryPromise(queryRequest);
 
-    if (options.write) {
-      // Save backup req and response as timestamp.json
-      const writePath = path.resolve(options.write, `${Date.now()}.json`);
-      fs.writeFileSync(writePath, JSON.stringify({ request: queryRequest, response: queryResponseProcessed }), 'utf8');
+    if (this.options.backup) {
+      Api._saveQueryData(this.options.backup, queryRequest, queryResponse)
     }
+    const queryResponseProcessed = Api._processQueryResponse(queryResponse);
 
     return queryResponseProcessed;
   }
 
-
   /**
-   * Process the query response body to get prettified information
-   * @param {Object} body - The response body from the query request
-   * @returns {Array} flights - The available flights for the query
+   * Save request and response data to json file for backup purposes
+   * @param {String} path - Path to save file
+   * @param {Object} request - Query request
+   * @param {Object} response - Query response
    * @private
    */
-  static _processQueryResponse(body) {
+  static _saveQueryData(path, request, response) {
+    // Save backup req and response as timestamp.json
+    const writePath = path.resolve(path, `${moment().format('MM-DD-YYYY_h:mm:ssa')}.json`);
+    fs.writeFileSync(writePath, JSON.stringify({ request, response}, null, 2), 'utf8');
+  }
+
+  /**
+   * Process the query response to get prettified information
+   * @param {Object} response - The response body from the query request
+   * @returns {Array} flights - The available flights for the query
+   * @throws
+   * @private
+   */
+  static _processQueryResponse(response) {
+    const { body } = response;
+    if (body.error) {
+      throw Error(body.error);
+    }
+
     const tripOptions = body.trips.tripOption;
     const flights = tripOptions.map((tripOption) => {
       const airline = tripOption.slice[0].segment[0].flight.carrier;
@@ -62,15 +84,16 @@ class Api {
    * Returns a promise which resolves to the response body
    * @param {Object} queryRequest - The request object made to the QPX api
    * @returns {Promise} Promise with query response body
+   * @throws
    * @private
    */
   static async _queryPromise(queryRequest) {
-    const response = await request(queryRequest);
-    const { body } = response;
-
-    if (body.error) throw(body.error);
-
-    return body;
+    try {
+      const response = await request(queryRequest);
+      return response;
+    } catch(e) {
+      throw e;
+    }
   }
 
   /**
