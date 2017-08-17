@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 const request = require('request-promise');
 
 class Api {
@@ -26,12 +27,13 @@ class Api {
     const url = `https://www.googleapis.com/qpxExpress/v1/trips/search?key=${this.apikey}`;
 
     const queryBody = Api._getQueryBody(adultCount, maxPrice, solutions, origin, destination, date);
-    const queryRequest = { method: 'post', url, body: queryBody, json: true };
+    const queryRequest = { method: 'POST', url, body: queryBody, json: true };
     const queryResponseBody = await Api._queryPromise(queryRequest);
     const queryResponseProcessed = Api._processQueryResponse(queryResponseBody);
 
-    const writePath = options.write;
-    if (writePath) {
+    if (options.write) {
+      // Save backup req and response as timestamp.json
+      const writePath = path.resolve(options.write, `${Date.now()}.json`);
       fs.writeFileSync(writePath, JSON.stringify({ request: queryRequest, response: queryResponseProcessed }), 'utf8');
     }
 
