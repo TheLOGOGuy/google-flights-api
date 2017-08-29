@@ -61,7 +61,7 @@
     "build": "babel src -d build",
     "docs": "jsdoc2md --configure .jsdoc --template README.hbs --files ./src/Api.js > README.md",
     "prepublish": "npm run build && npm run docs",
-    "precommit": "lint-staged && npm run build && git add .",
+    "precommit": "lint-staged && npm run build && npm run docs && git add .",
     "lint-js": "eslint --ignore-path .gitignore --quiet --ignore-pattern \"!**/.*\" .",
     "lint": "npm run lint-js",
     "fix-js": "npm run lint-js -- --fix",
