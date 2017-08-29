@@ -24,10 +24,12 @@ var _ = require('lodash');
  * Instantiates the object for interacting with Google QPX API
  * @class Api
  * @param {String} apikey - QPX api key
- * @param {Object} options - Optional parameters
+ * @param {Object} [options = {}] - Optional parameters
  * @param {String} [options.backup] - Absolute path for location to save full query response and request in JSON
  */
-function Api(apikey, options) {
+function Api(apikey) {
+  var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
   this.options = options;
   if (!apikey || typeof apikey !== 'string' || apikey.length === 0) {
     throw Error('Api class expects a valid apikey');
@@ -44,7 +46,8 @@ function Api(apikey, options) {
  * @param {String} q.maxPrice - The max price for the trip. Note - Must be prefixed with currency i.e. EUR.
  * @param {String} q.origin - The origin airport code.
  * @param {String} q.destination - The destination airport code.
- * @param {String} q.date - The date of the flight... '2016-12-14'
+ * @param {String | Number} q.date - The date of the flight... moment will attempt to parse the date to YYYY-MM-DD
+ * e.g. '2016-12-14' or ms timestamp will work
  * @param {Number} [q.solutions=500] - The number of possible routes the API should return.
  * @param {Number} [q.adultCount=1] - The number of adults going on the trip.
  * @param {String} [q.saleCountry] - IATA country code representing the point of sale.
@@ -88,7 +91,7 @@ Api.prototype.query = function () {
     }, _callee, this);
   }));
 
-  function query(_x) {
+  function query(_x2) {
     return _ref.apply(this, arguments);
   }
 
@@ -107,7 +110,7 @@ Api.prototype.query = function () {
  */
 Api._saveQueryData = function (savePath, req, res) {
   // Save backup req and response as timestamp.json
-  var writePath = path.resolve(savePath, moment().format('MM-DD-YYYY_h:mm:ssa') + '.json');
+  var writePath = path.resolve(savePath, moment(req.slice[0].date).format('MM-DD-YYYY_h:mm:ssa') + '.json');
   fs.writeFileSync(writePath, (0, _stringify2.default)({ request: request, response: res }, null, 2), 'utf8');
 };
 
@@ -174,7 +177,7 @@ Api._queryPromise = function () {
     }, _callee2, this, [[0, 7]]);
   }));
 
-  return function (_x2) {
+  return function (_x3) {
     return _ref2.apply(this, arguments);
   };
 }();
@@ -206,6 +209,7 @@ Api._getQueryBody = function (_ref3) {
       saleCountry = _ref3.saleCountry,
       preferredCabins = _ref3.preferredCabins;
 
+  date = moment(date).format('YYYY-MM-DD');
   return {
     request: {
       passengers: { adultCount: adultCount },
