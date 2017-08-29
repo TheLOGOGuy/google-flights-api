@@ -1,36 +1,41 @@
-# Google Flights Api
-Forked from https://github.com/adhorrig/google-flights-wrapper
+<a name="Api"></a>
 
-## Installation
+## Api
+**Kind**: global class  
 
-```
-npm install google-flights-api
-```
+* [Api](#Api)
+    * [new Api(apikey, options)](#new_Api_new)
+    * [.query](#Api+query) ⇒ <code>Promise</code>
 
-## Usage
+<a name="new_Api_new"></a>
 
-```javascript
-const API_KEY = '1234';
-const options =  { write: __dirname + '/data'};
-const qpx = require('google-flights-api')(API_KEY, options);
+### new Api(apikey, options)
+Instantiates the object for interacting with Google QPX API
 
-qpx.query("1", "EUR5000", "1", "DUB", "GDN", "2016-12-14").then((data) => {
-  //data looks like: [ { airline: 'SK', price: 'EUR71.10' } ]
-}).catch(console.error);
-```
 
-## Api Class Parameters
-```
-apikey: Your api key for qpx
-options.write: Path to save a backup of the query request and response
-```
-## Api Query Parameters:
+| Param | Type | Description |
+| --- | --- | --- |
+| apikey | <code>String</code> | QPX api key |
+| options | <code>Object</code> | Optional parameters |
+| [options.backup] | <code>String</code> | Absolute path for location to save full query response and request in JSON |
 
-```
-adultCount: The number of adults going on the trip.
-maxPrice: The max price for the trip. Note: Must be prefixed with currency i.e. EUR.
-solutions: The number of possible routes the API should return.
-origin: The origin airport code.
-destination: The destination airport code.
-date: The date of the flight.
-```
+<a name="Api+query"></a>
+
+### api.query ⇒ <code>Promise</code>
+Perform a Google QPX query and get results processed for clarity
+
+**Kind**: instance property of [<code>Api</code>](#Api)  
+**See**: https://developers.google.com/qpx-express/v1/trips/search  
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| q | <code>Object</code> |  | Query object |
+| q.maxPrice | <code>String</code> |  | The max price for the trip. Note - Must be prefixed with currency i.e. EUR. |
+| q.origin | <code>String</code> |  | The origin airport code. |
+| q.destination | <code>String</code> |  | The destination airport code. |
+| q.date | <code>String</code> |  | The date of the flight... '2016-12-14' |
+| [q.solutions] | <code>Number</code> | <code>500</code> | The number of possible routes the API should return. |
+| [q.adultCount] | <code>Number</code> | <code>1</code> | The number of adults going on the trip. |
+| [q.saleCountry] | <code>String</code> |  | IATA country code representing the point of sale. This determines the "equivalent amount paid" currency for the ticket. |
+| [q.preferredCabins] |  |  | Prefer solutions that book in this cabin for this slice. Allowed values are COACH, PREMIUM_COACH, BUSINESS, and FIRST. |
+
