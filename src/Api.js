@@ -22,7 +22,7 @@ function Api(apikey, options = {}) {
 // instance methods
 /**
  * Perform a Google QPX query and get results processed for clarity
- * @see https://developers.google.com/qpx-express/v1/trips/search
+ * @see https://developers.google.com/qpx-express/v1/trips/search#request
  * @memberOf Api
  * @param {Object} q - Query object
  * @param {String} q.maxPrice - The max price for the trip. Note - Must be prefixed with currency i.e. EUR.
@@ -76,6 +76,7 @@ Api._saveQueryData = function (savePath, req, res) {
 
 /**
  * Process the query response to get prettified information
+ * @see https://developers.google.com/qpx-express/v1/trips/search#response
  * @param {Object} response - The response body from the query request
  * @returns {Array} flights - The available flights for the query
  * @throws Will throw an error if the response body contains the error key

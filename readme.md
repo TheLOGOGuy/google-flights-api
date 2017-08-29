@@ -54,7 +54,7 @@ Instantiates the object for interacting with Google QPX API
 Perform a Google QPX query and get results processed for clarity
 
 **Kind**: instance property of [<code>Api</code>](#Api)  
-**See**: https://developers.google.com/qpx-express/v1/trips/search  
+**See**: https://developers.google.com/qpx-express/v1/trips/search#request  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
