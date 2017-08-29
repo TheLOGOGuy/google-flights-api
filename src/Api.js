@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
 const request = require('request-promise');
-// const _ = require('lodash');
+const _ = require('lodash');
 
 /**
  * Instantiates the object for interacting with Google QPX API
@@ -33,14 +33,18 @@ function Api(apikey, options) {
  * @param {Number} [q.adultCount=1] - The number of adults going on the trip.
  * @param {String} [q.saleCountry] - IATA country code representing the point of sale.
  * This determines the "equivalent amount paid" currency for the ticket.
- * @param [q.preferredCabins] - Prefer solutions that book in this cabin for this slice.
+ * @param {String} [q.preferredCabins] - Prefer solutions that book in this cabin for this slice.
  * Allowed values are COACH, PREMIUM_COACH, BUSINESS, and FIRST.
  * @returns {Promise}
  */
 Api.prototype.query = async function query(q) {
+  const defaultQ = {
+    adultCount: 1,
+    solutions: 500,
+  };
   const url = `https://www.googleapis.com/qpxExpress/v1/trips/search?key=${this.apikey}`;
 
-  const queryBody = Api._getQueryBody(q);
+  const queryBody = Api._getQueryBody(_.defaultsDeep(q, defaultQ));
   const queryRequest = { method: 'POST', url, body: queryBody, json: true };
   const queryResponse = await Api._queryPromise(queryRequest);
 
@@ -117,22 +121,22 @@ Api._queryPromise = async function (queryRequest) {
  * Refer to Api.query for details about params
  * @see Api.query
  * @param {Object} q
- * @param {Number} q.adultCount
  * @param {String} q.maxPrice
  * @param {Number} q.solutions
  * @param {String} q.origin
  * @param {String} q.destination
  * @param {String} q.date
- * @param {String} q.saleCountry
- * @param {String} q.preferredCabins
+ * @param {Number} [q.adultCount]
+ * @param {String} [q.saleCountry]
+ * @param {String} [q.preferredCabins]
  * @static
  * @memberOf Api
  * @private
  */
 Api._getQueryBody = function ({
-                                adultCount = 1,
+                                adultCount,
                                 maxPrice,
-                                solutions = 500,
+                                solutions,
                                 origin,
                                 destination,
                                 date,

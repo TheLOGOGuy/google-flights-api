@@ -1,3 +1,32 @@
+# Google Flights Api
+
+## Installation
+
+```
+npm install google-flights-api
+```
+
+## Usage
+
+```javascript
+const API_KEY = '1234';
+const options =  { write: __dirname + '/data'};
+const qpx = require('google-flights-api')(API_KEY, options);
+
+const q = {
+   adultCount: 1, 
+   maxPrice: 'EUR5000', 
+   solutions: 1, 
+   origin: 'DUB',
+   destination: 'GDN', 
+   date: '2016-12-14'
+};
+qpx.query(q).then((data) => {
+  //data looks like: [ { airline: 'SK', price: 'EUR71.10' } ]
+}).catch(console.error);
+```
+## Documentation
+
 <a name="Api"></a>
 
 ## Api
@@ -37,5 +66,14 @@ Perform a Google QPX query and get results processed for clarity
 | [q.solutions] | <code>Number</code> | <code>500</code> | The number of possible routes the API should return. |
 | [q.adultCount] | <code>Number</code> | <code>1</code> | The number of adults going on the trip. |
 | [q.saleCountry] | <code>String</code> |  | IATA country code representing the point of sale. This determines the "equivalent amount paid" currency for the ticket. |
-| [q.preferredCabins] |  |  | Prefer solutions that book in this cabin for this slice. Allowed values are COACH, PREMIUM_COACH, BUSINESS, and FIRST. |
+| [q.preferredCabins] | <code>String</code> |  | Prefer solutions that book in this cabin for this slice. Allowed values are COACH, PREMIUM_COACH, BUSINESS, and FIRST. |
+
+
+## Contributing
+
+### Updating docs
+Docs are generated from JSDocs via `npm run docs`
+
+## Credits
+Forked from [adhorrig's](https://github.com/adhorrig), [google-flight-wrapper](https://github.com/adhorrig/google-flights-wrapper)
 

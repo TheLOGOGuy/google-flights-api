@@ -18,7 +18,7 @@ var fs = require('fs');
 var path = require('path');
 var moment = require('moment');
 var request = require('request-promise');
-// const _ = require('lodash');
+var _ = require('lodash');
 
 /**
  * Instantiates the object for interacting with Google QPX API
@@ -49,24 +49,28 @@ function Api(apikey, options) {
  * @param {Number} [q.adultCount=1] - The number of adults going on the trip.
  * @param {String} [q.saleCountry] - IATA country code representing the point of sale.
  * This determines the "equivalent amount paid" currency for the ticket.
- * @param [q.preferredCabins] - Prefer solutions that book in this cabin for this slice.
+ * @param {String} [q.preferredCabins] - Prefer solutions that book in this cabin for this slice.
  * Allowed values are COACH, PREMIUM_COACH, BUSINESS, and FIRST.
  * @returns {Promise}
  */
 Api.prototype.query = function () {
   var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(q) {
-    var url, queryBody, queryRequest, queryResponse, queryResponseProcessed;
+    var defaultQ, url, queryBody, queryRequest, queryResponse, queryResponseProcessed;
     return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
+            defaultQ = {
+              adultCount: 1,
+              solutions: 500
+            };
             url = 'https://www.googleapis.com/qpxExpress/v1/trips/search?key=' + this.apikey;
-            queryBody = Api._getQueryBody(q);
+            queryBody = Api._getQueryBody(_.defaultsDeep(q, defaultQ));
             queryRequest = { method: 'POST', url: url, body: queryBody, json: true };
-            _context.next = 5;
+            _context.next = 6;
             return Api._queryPromise(queryRequest);
 
-          case 5:
+          case 6:
             queryResponse = _context.sent;
 
 
@@ -76,7 +80,7 @@ Api.prototype.query = function () {
             queryResponseProcessed = Api._processQueryResponse(queryResponse);
             return _context.abrupt('return', queryResponseProcessed);
 
-          case 9:
+          case 10:
           case 'end':
             return _context.stop();
         }
@@ -180,24 +184,22 @@ Api._queryPromise = function () {
  * Refer to Api.query for details about params
  * @see Api.query
  * @param {Object} q
- * @param {Number} q.adultCount
  * @param {String} q.maxPrice
  * @param {Number} q.solutions
  * @param {String} q.origin
  * @param {String} q.destination
  * @param {String} q.date
- * @param {String} q.saleCountry
- * @param {String} q.preferredCabins
+ * @param {Number} [q.adultCount]
+ * @param {String} [q.saleCountry]
+ * @param {String} [q.preferredCabins]
  * @static
  * @memberOf Api
  * @private
  */
 Api._getQueryBody = function (_ref3) {
-  var _ref3$adultCount = _ref3.adultCount,
-      adultCount = _ref3$adultCount === undefined ? 1 : _ref3$adultCount,
+  var adultCount = _ref3.adultCount,
       maxPrice = _ref3.maxPrice,
-      _ref3$solutions = _ref3.solutions,
-      solutions = _ref3$solutions === undefined ? 500 : _ref3$solutions,
+      solutions = _ref3.solutions,
       origin = _ref3.origin,
       destination = _ref3.destination,
       date = _ref3.date,
