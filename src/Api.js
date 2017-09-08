@@ -7,12 +7,13 @@ const _ = require('lodash');
 /**
  * Instantiates the object for interacting with Google QPX API
  * @class Api
- * @param {String} apikey - QPX api key
- * @param {Object} [options = {}] - Optional parameters
- * @param {String} [options.backup] - Absolute path for location to save full query response and request in JSON
+ * @param {String} apikey                       - QPX api key
+ * @param {Object} [options = {}]               - Optional parameters
+ * @param {String} [options.backup = false]     - Absolute path for location to save full query response and request in JSON
  */
-function Api(apikey, options = {}) {
-  this.options = options;
+function Api(apikey, options) {
+  const defaultOptions = { backup: false };
+  this.options = _.defaultsDeep(options, defaultOptions);
   if (!apikey || typeof apikey !== 'string' || apikey.length === 0) {
     throw Error('Api class expects a valid apikey');
   }
@@ -29,13 +30,12 @@ function Api(apikey, options = {}) {
  * @param {String} q.maxPrice                 - The max price for the trip. Note - Must be prefixed with currency i.e. EUR.
  * @param {String} q.origin                   - The origin airport code.
  * @param {String} q.destination              - The destination airport code.
- * @param {String | Number} q.date            - The date of the flight... moment will attempt to parse the date to YYYY-MM-DD
+ * @param {String|Number} q.date              - The date of the flight... moment will attempt to parse the date to YYYY-MM-DD
  *                                                e.g. '2016-12-14' or ms timestamp will work
  * @param {Number} [q.solutions=500]          - The number of possible routes the API should return.
  * @param {Number} [q.adultCount=1]           - The number of adults going on the trip.
  * @param {Number} [q.childCount=0]           - The number of children going on the trip.
- * @param {Number} [q.infantInLapCount=0]     - The number of passengers that are infants travelling in the lap of
- * an adult.
+ * @param {Number} [q.infantInLapCount=0]     - The number of passengers that are infants travelling in the lap of an adult.
  * @param {Number} [q.infantInSeatCount=0]    - The number of passengers that are infants each assigned a seat.
  * @param {Number} [q.seniorCount=0]          - The number of passengers that are senior citizens.
  * @param {Number} [q.maxStops=∞]             - The maximum number of stops the passenger(s)
@@ -43,16 +43,16 @@ function Api(apikey, options = {}) {
  * @param {Number} [q.maxConnectionDuration=∞]- The longest connection between two legs, in minutes.
  * @param {String} [q.earliestTime=00:00]     - The earliest time of day in HH:MM format for departure.
  * @param {String} [q.latestTime=23:59]       - The latest time of day in HH:MM format for departure.
- * @param {String} [q.saleCountry]            - IATA country code representing the point of sale.
- *                                                This determines the "equivalent amount paid" currency for the ticket.
- * @param {String} [q.ticketingCountry]       - IATA country code representing the point of ticketing.
- * @param {String} [q.refundable]             - Return only solutions with refundable fares.
+ * @param {String} [q.refundable=Either]      - Return only solutions with refundable fares.
  * @param {String} [q.preferredCabin=Any]     - Allowed values are COACH, PREMIUM_COACH, BUSINESS, and FIRST.
  * @param {Array}  [q.permittedCarrier=Any]   - A list of 2-letter IATA airline designators to filter your results.
  * @param {Array}  [q.prohibitedCarrier=None] - A list of 2-letter IATA airline designators. Exclude results that match.
- * @param {String} [q.alliance]               - Slices with only the carriers in this alliance should be returned;
+ * @param {String} [q.alliance=Any]           - Slices with only the carriers in this alliance should be returned;
  *                                                do not use this field with permittedCarrier.
  *                                                Allowed values are ONEWORLD, SKYTEAM, and STAR.
+ * @param {String} [q.saleCountry]            - IATA country code representing the point of sale.
+ *                                                This determines the "equivalent amount paid" currency for the ticket.
+ * @param {String} [q.ticketingCountry]       - IATA country code representing the point of ticketing.
  * @returns {Promise}                         - Resolves to response object
  *                                                @see https://developers.google.com/qpx-express/v1/trips/search#response
  */
@@ -76,6 +76,7 @@ Api.prototype.query = async function query(q) {
 /**
  * Perform a Google QPX query, no processing will be done on the query or response so it must follow the api format
  * @see https://developers.google.com/qpx-express/v1/trips/search#request
+ * @see https://developers.google.com/qpx-express/v1/trips/search#response
  * @memberOf Api
  * @param {Object} q - Query object
  * @returns {Promise}

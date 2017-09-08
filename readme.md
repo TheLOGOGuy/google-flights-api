@@ -3,7 +3,7 @@
 ## Installation
 
 ```
-npm install google-flights-api
+npm install --save google-flights-api
 ```
 
 ## Usage
@@ -47,7 +47,7 @@ Instantiates the object for interacting with Google QPX API
 | --- | --- | --- | --- |
 | apikey | <code>String</code> |  | QPX api key |
 | [options] | <code>Object</code> | <code>{}</code> | Optional parameters |
-| [options.backup] | <code>String</code> |  | Absolute path for location to save full query response and request in JSON |
+| [options.backup] | <code>String</code> | <code>false</code> | Absolute path for location to save full query response and request in JSON |
 
 <a name="Api+query"></a>
 
@@ -79,13 +79,13 @@ Perform a Google QPX query and get results processed for clarity
 | [q.maxConnectionDuration] | <code>Number</code> | <code>∞</code> | The longest connection between two legs, in minutes. |
 | [q.earliestTime] | <code>String</code> | <code>00:00</code> | The earliest time of day in HH:MM format for departure. |
 | [q.latestTime] | <code>String</code> | <code>23:59</code> | The latest time of day in HH:MM format for departure. |
-| [q.saleCountry] | <code>String</code> |  | IATA country code representing the point of sale.                                                This determines the "equivalent amount paid" currency for the ticket. |
-| [q.ticketingCountry] | <code>String</code> |  | IATA country code representing the point of ticketing. |
-| [q.refundable] | <code>String</code> |  | Return only solutions with refundable fares. |
+| [q.refundable] | <code>String</code> | <code>Either</code> | Return only solutions with refundable fares. |
 | [q.preferredCabin] | <code>String</code> | <code>Any</code> | Allowed values are COACH, PREMIUM_COACH, BUSINESS, and FIRST. |
 | [q.permittedCarrier] | <code>Array</code> | <code>Any</code> | A list of 2-letter IATA airline designators to filter your results. |
 | [q.prohibitedCarrier] | <code>Array</code> | <code>None</code> | A list of 2-letter IATA airline designators. Exclude results that match. |
-| [q.alliance] | <code>String</code> |  | Slices with only the carriers in this alliance should be returned;                                                do not use this field with permittedCarrier.                                                Allowed values are ONEWORLD, SKYTEAM, and STAR. |
+| [q.alliance] | <code>String</code> | <code>Any</code> | Slices with only the carriers in this alliance should be returned;                                                do not use this field with permittedCarrier.                                                Allowed values are ONEWORLD, SKYTEAM, and STAR. |
+| [q.saleCountry] | <code>String</code> |  | IATA country code representing the point of sale.                                                This determines the "equivalent amount paid" currency for the ticket. |
+| [q.ticketingCountry] | <code>String</code> |  | IATA country code representing the point of ticketing. |
 
 <a name="Api+rawQuery"></a>
 
@@ -93,7 +93,11 @@ Perform a Google QPX query and get results processed for clarity
 Perform a Google QPX query, no processing will be done on the query or response so it must follow the api format
 
 **Kind**: instance property of [<code>Api</code>](#Api)  
-**See**: https://developers.google.com/qpx-express/v1/trips/search#request  
+**See**
+
+- https://developers.google.com/qpx-express/v1/trips/search#request
+- https://developers.google.com/qpx-express/v1/trips/search#response
+
 
 | Param | Type | Description |
 | --- | --- | --- |
