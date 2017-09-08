@@ -67,7 +67,7 @@ Api.prototype.query = async function query(q) {
   const queryResponse = await Api._queryPromise(queryRequest);
 
   if (this.options.backup) {
-    Api._saveQueryData(this.options.backup, queryRequest, queryResponse);
+    Api._saveQueryData(this.options.backup, q, queryRequest, queryResponse);
   }
 
   return queryResponse;
@@ -86,7 +86,7 @@ Api.prototype.rawQuery = async function query(q) {
   const queryResponse = await Api._queryPromise(queryRequest);
 
   if (this.options.backup) {
-    Api._saveQueryData(this.options.backup, queryRequest, queryResponse);
+    Api._saveQueryData(this.options.backup, q, queryRequest, queryResponse);
   }
 
   return queryResponse;
@@ -96,17 +96,21 @@ Api.prototype.rawQuery = async function query(q) {
 // static methods
 /**
  * Save request and response data to json file for backup purposes
- * @param {String} savePath - Path to save file
- * @param {Object} req - Query request
- * @param {Object} res - Query response
+ * @param {String} savePath     - Path to save file
+ * @param {Object} q            - Original query argument
+ * @param {Object} req          - Query request
+ * @param {Object} res          - Query response
  * @static
  * @memberOf Api
  * @private
  */
-Api._saveQueryData = function (savePath, req, res) {
+Api._saveQueryData = function (savePath, q, req, res) {
   // Save backup req and response as timestamp.json
-  const writePath = path.resolve(savePath, `${moment(req.slice[0].date).format('MM-DD-YYYY_h:mm:ssa')}.json`);
-  fs.writeFileSync(writePath, JSON.stringify({ request, response: res }, null, 2), 'utf8');
+  const qDate = moment(q.date).format('MM-DD-YY');
+  const currDate = moment().format('MM-DD-YY_h:mm:ssa');
+  const f = `${qDate}__${q.origin}__${q.destination}__${currDate}.json`;
+  const writePath = path.resolve(savePath, f);
+  fs.writeFileSync(writePath, JSON.stringify({ query: q, request: req, response: res }, null, 2), 'utf8');
 };
 
 /**

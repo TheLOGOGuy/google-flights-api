@@ -93,7 +93,7 @@ Api.prototype.query = function () {
 
 
             if (this.options.backup) {
-              Api._saveQueryData(this.options.backup, queryRequest, queryResponse);
+              Api._saveQueryData(this.options.backup, q, queryRequest, queryResponse);
             }
 
             return _context.abrupt('return', queryResponse);
@@ -137,7 +137,7 @@ Api.prototype.rawQuery = function () {
 
 
             if (this.options.backup) {
-              Api._saveQueryData(this.options.backup, queryRequest, queryResponse);
+              Api._saveQueryData(this.options.backup, q, queryRequest, queryResponse);
             }
 
             return _context2.abrupt('return', queryResponse);
@@ -160,17 +160,21 @@ Api.prototype.rawQuery = function () {
 // static methods
 /**
  * Save request and response data to json file for backup purposes
- * @param {String} savePath - Path to save file
- * @param {Object} req - Query request
- * @param {Object} res - Query response
+ * @param {String} savePath     - Path to save file
+ * @param {Object} q            - Original query argument
+ * @param {Object} req          - Query request
+ * @param {Object} res          - Query response
  * @static
  * @memberOf Api
  * @private
  */
-Api._saveQueryData = function (savePath, req, res) {
+Api._saveQueryData = function (savePath, q, req, res) {
   // Save backup req and response as timestamp.json
-  var writePath = path.resolve(savePath, moment(req.slice[0].date).format('MM-DD-YYYY_h:mm:ssa') + '.json');
-  fs.writeFileSync(writePath, (0, _stringify2.default)({ request: request, response: res }, null, 2), 'utf8');
+  var qDate = moment(q.date).format('MM-DD-YY');
+  var currDate = moment().format('MM-DD-YY_h:mm:ssa');
+  var f = qDate + '__' + q.origin + '__' + q.destination + '__' + currDate + '.json';
+  var writePath = path.resolve(savePath, f);
+  fs.writeFileSync(writePath, (0, _stringify2.default)({ query: q, request: req, response: res }, null, 2), 'utf8');
 };
 
 /**
