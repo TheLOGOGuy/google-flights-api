@@ -27,6 +27,20 @@ qpx.query(q).then((data) => {
 ```
 ## Documentation
 
+## Classes
+
+<dl>
+<dt><a href="#Api">Api</a></dt>
+<dd></dd>
+</dl>
+
+## Typedefs
+
+<dl>
+<dt><a href="#queryCb">queryCb</a> : <code>function</code></dt>
+<dd></dd>
+</dl>
+
 <a name="Api"></a>
 
 ## Api
@@ -34,8 +48,8 @@ qpx.query(q).then((data) => {
 
 * [Api](#Api)
     * [new Api(apikey, [options])](#new_Api_new)
-    * [.query](#Api+query) ⇒ <code>Promise</code>
-    * [.rawQuery](#Api+rawQuery) ⇒ <code>Promise</code>
+    * [.query](#Api+query) ⇒ <code>Promise</code> \| <code>undefined</code>
+    * [.rawQuery](#Api+rawQuery) ⇒ <code>Promise</code> \| <code>undefined</code>
 
 <a name="new_Api_new"></a>
 
@@ -51,11 +65,11 @@ Instantiates the object for interacting with Google QPX API
 
 <a name="Api+query"></a>
 
-### api.query ⇒ <code>Promise</code>
-Perform a Google QPX query and get results processed for clarity
+### api.query ⇒ <code>Promise</code> \| <code>undefined</code>
+Perform a Google QPX query
 
 **Kind**: instance property of [<code>Api</code>](#Api)  
-**Returns**: <code>Promise</code> - - Resolves to response object  
+**Returns**: <code>Promise</code> \| <code>undefined</code> - - Resolves to response object or undefined if using callback  
 **See**
 
 - https://developers.google.com/qpx-express/v1/trips/search#request
@@ -86,22 +100,36 @@ Perform a Google QPX query and get results processed for clarity
 | [q.alliance] | <code>String</code> | <code>Any</code> | Slices with only the carriers in this alliance should be returned;                                                do not use this field with permittedCarrier.                                                Allowed values are ONEWORLD, SKYTEAM, and STAR. |
 | [q.saleCountry] | <code>String</code> |  | IATA country code representing the point of sale.                                                This determines the "equivalent amount paid" currency for the ticket. |
 | [q.ticketingCountry] | <code>String</code> |  | IATA country code representing the point of ticketing. |
+| [cb] | [<code>queryCb</code>](#queryCb) |  | If you want to use callbacks instead of promises |
 
 <a name="Api+rawQuery"></a>
 
-### api.rawQuery ⇒ <code>Promise</code>
+### api.rawQuery ⇒ <code>Promise</code> \| <code>undefined</code>
 Perform a Google QPX query, no processing will be done on the query or response so it must follow the api format
 
 **Kind**: instance property of [<code>Api</code>](#Api)  
+**Returns**: <code>Promise</code> \| <code>undefined</code> - - Resolves to response object or undefined if using callback  
 **See**
 
 - https://developers.google.com/qpx-express/v1/trips/search#request
+- https://developers.google.com/qpx-express/v1/trips/search#response
 - https://developers.google.com/qpx-express/v1/trips/search#response
 
 
 | Param | Type | Description |
 | --- | --- | --- |
 | q | <code>Object</code> | Query object |
+| [cb] | [<code>queryCb</code>](#queryCb) | If you want to use callbacks instead of promises |
+
+<a name="queryCb"></a>
+
+## queryCb : <code>function</code>
+**Kind**: global typedef  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| error | <code>Error</code> \| <code>undefined</code> | query error, undefined if success |
+| [response] | <code>Object</code> \| <code>undefined</code> | query response object, undefined if error |
 
 
 ## Contributing

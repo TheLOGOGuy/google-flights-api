@@ -21,6 +21,11 @@ var request = require('request-promise');
 var _ = require('lodash');
 
 /**
+ * @callback queryCb
+ * @param {Error | undefined}   error                 - query error, undefined if success
+ * @param {Object | undefined} [response]             - query response object, undefined if error
+ */
+/**
  * Instantiates the object for interacting with Google QPX API
  * @class Api
  * @param {String} apikey                       - QPX api key
@@ -39,7 +44,7 @@ function Api(apikey, options) {
 
 // instance methods
 /**
- * Perform a Google QPX query and get results processed for clarity
+ * Perform a Google QPX query
  * @see https://developers.google.com/qpx-express/v1/trips/search#request
  * @memberOf Api
  * @param {Object} q                          - Query object
@@ -69,26 +74,47 @@ function Api(apikey, options) {
  * @param {String} [q.saleCountry]            - IATA country code representing the point of sale.
  *                                                This determines the "equivalent amount paid" currency for the ticket.
  * @param {String} [q.ticketingCountry]       - IATA country code representing the point of ticketing.
- * @returns {Promise}                         - Resolves to response object
+ * @param {queryCb} [cb]                      - If you want to use callbacks instead of promises
+ * @returns {Promise | undefined}             - Resolves to response object or undefined if using callback
  *                                                @see https://developers.google.com/qpx-express/v1/trips/search#response
  */
 Api.prototype.query = function () {
-  var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(q) {
+  var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(q, cb) {
     var defaultQ, queryBody, queryRequest, queryResponse;
     return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
+            if (!cb) {
+              _context.next = 12;
+              break;
+            }
+
+            _context.prev = 1;
+            _context.t0 = cb;
+            _context.next = 5;
+            return this.query(q);
+
+          case 5:
+            _context.t1 = _context.sent;
+            return _context.abrupt('return', (0, _context.t0)(null, _context.t1));
+
+          case 9:
+            _context.prev = 9;
+            _context.t2 = _context['catch'](1);
+            return _context.abrupt('return', cb(_context.t2));
+
+          case 12:
             defaultQ = {
               adultCount: 1,
               solutions: 500
             };
             queryBody = Api._getQueryBody(_.defaultsDeep(q, defaultQ));
             queryRequest = { method: 'POST', url: this.url, body: queryBody, json: true };
-            _context.next = 5;
+            _context.next = 17;
             return Api._queryPromise(queryRequest);
 
-          case 5:
+          case 17:
             queryResponse = _context.sent;
 
 
@@ -98,15 +124,15 @@ Api.prototype.query = function () {
 
             return _context.abrupt('return', queryResponse);
 
-          case 8:
+          case 20:
           case 'end':
             return _context.stop();
         }
       }
-    }, _callee, this);
+    }, _callee, this, [[1, 9]]);
   }));
 
-  function query(_x) {
+  function query(_x, _x2) {
     return _ref.apply(this, arguments);
   }
 
@@ -118,21 +144,43 @@ Api.prototype.query = function () {
  * @see https://developers.google.com/qpx-express/v1/trips/search#request
  * @see https://developers.google.com/qpx-express/v1/trips/search#response
  * @memberOf Api
- * @param {Object} q - Query object
- * @returns {Promise}
+ * @param    {Object}   q                      - Query object
+ * @param    {queryCb} [cb]                    - If you want to use callbacks instead of promises
+ * @returns  {Promise | undefined}             - Resolves to response object or undefined if using callback
+ *                                                @see https://developers.google.com/qpx-express/v1/trips/search#response
  */
 Api.prototype.rawQuery = function () {
-  var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(q) {
+  var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(q, cb) {
     var queryRequest, queryResponse;
     return _regenerator2.default.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
+            if (!cb) {
+              _context2.next = 12;
+              break;
+            }
+
+            _context2.prev = 1;
+            _context2.t0 = cb;
+            _context2.next = 5;
+            return this.query(q);
+
+          case 5:
+            _context2.t1 = _context2.sent;
+            return _context2.abrupt('return', (0, _context2.t0)(null, _context2.t1));
+
+          case 9:
+            _context2.prev = 9;
+            _context2.t2 = _context2['catch'](1);
+            return _context2.abrupt('return', cb(_context2.t2));
+
+          case 12:
             queryRequest = { method: 'POST', url: this.url, body: q, json: true };
-            _context2.next = 3;
+            _context2.next = 15;
             return Api._queryPromise(queryRequest);
 
-          case 3:
+          case 15:
             queryResponse = _context2.sent;
 
 
@@ -142,15 +190,15 @@ Api.prototype.rawQuery = function () {
 
             return _context2.abrupt('return', queryResponse);
 
-          case 6:
+          case 18:
           case 'end':
             return _context2.stop();
         }
       }
-    }, _callee2, this);
+    }, _callee2, this, [[1, 9]]);
   }));
 
-  function query(_x2) {
+  function query(_x3, _x4) {
     return _ref2.apply(this, arguments);
   }
 
@@ -214,7 +262,7 @@ Api._queryPromise = function () {
     }, _callee3, this, [[0, 7]]);
   }));
 
-  return function (_x3) {
+  return function (_x5) {
     return _ref3.apply(this, arguments);
   };
 }();

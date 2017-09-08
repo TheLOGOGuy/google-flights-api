@@ -5,6 +5,11 @@ const request = require('request-promise');
 const _ = require('lodash');
 
 /**
+ * @callback queryCb
+ * @param {Error | undefined}   error                 - query error, undefined if success
+ * @param {Object | undefined} [response]             - query response object, undefined if error
+ */
+/**
  * Instantiates the object for interacting with Google QPX API
  * @class Api
  * @param {String} apikey                       - QPX api key
@@ -23,7 +28,7 @@ function Api(apikey, options) {
 
 // instance methods
 /**
- * Perform a Google QPX query and get results processed for clarity
+ * Perform a Google QPX query
  * @see https://developers.google.com/qpx-express/v1/trips/search#request
  * @memberOf Api
  * @param {Object} q                          - Query object
@@ -53,10 +58,20 @@ function Api(apikey, options) {
  * @param {String} [q.saleCountry]            - IATA country code representing the point of sale.
  *                                                This determines the "equivalent amount paid" currency for the ticket.
  * @param {String} [q.ticketingCountry]       - IATA country code representing the point of ticketing.
- * @returns {Promise}                         - Resolves to response object
+ * @param {queryCb} [cb]                      - If you want to use callbacks instead of promises
+ * @returns {Promise | undefined}             - Resolves to response object or undefined if using callback
  *                                                @see https://developers.google.com/qpx-express/v1/trips/search#response
  */
-Api.prototype.query = async function query(q) {
+Api.prototype.query = async function query(q, cb) {
+  // When using callback instead of promise
+  if (cb) {
+    try {
+      return cb(null, await this.query(q));
+    } catch (e) {
+      return cb(e);
+    }
+  }
+
   const defaultQ = {
     adultCount: 1,
     solutions: 500,
@@ -78,10 +93,21 @@ Api.prototype.query = async function query(q) {
  * @see https://developers.google.com/qpx-express/v1/trips/search#request
  * @see https://developers.google.com/qpx-express/v1/trips/search#response
  * @memberOf Api
- * @param {Object} q - Query object
- * @returns {Promise}
+ * @param    {Object}   q                      - Query object
+ * @param    {queryCb} [cb]                    - If you want to use callbacks instead of promises
+ * @returns  {Promise | undefined}             - Resolves to response object or undefined if using callback
+ *                                                @see https://developers.google.com/qpx-express/v1/trips/search#response
  */
-Api.prototype.rawQuery = async function query(q) {
+Api.prototype.rawQuery = async function query(q, cb) {
+  // When using callback instead of promise
+  if (cb) {
+    try {
+      return cb(null, await this.query(q));
+    } catch (e) {
+      return cb(e);
+    }
+  }
+
   const queryRequest = { method: 'POST', url: this.url, body: q, json: true };
   const queryResponse = await Api._queryPromise(queryRequest);
 
