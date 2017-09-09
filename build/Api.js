@@ -19,6 +19,7 @@ var path = require('path');
 var moment = require('moment');
 var request = require('request-promise');
 var _ = require('lodash');
+var mkdirp = require('mkdirp');
 
 /**
  * @callback queryCb
@@ -31,6 +32,7 @@ var _ = require('lodash');
  * @param {String} apikey                       - QPX api key
  * @param {Object} [options = {}]               - Optional parameters
  * @param {String} [options.backup = false]     - Absolute path for location to save full query response and request in JSON
+ *                                                Backup filename = MM-DD-YY__origin__destination__current-date.json
  */
 function Api(apikey, options) {
   var defaultOptions = { backup: false };
@@ -147,7 +149,6 @@ Api.prototype.query = function () {
  * @param    {Object}   q                      - Query object
  * @param    {queryCb} [cb]                    - If you want to use callbacks instead of promises
  * @returns  {Promise | undefined}             - Resolves to response object or undefined if using callback
- *                                                @see https://developers.google.com/qpx-express/v1/trips/search#response
  */
 Api.prototype.rawQuery = function () {
   var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(q, cb) {
@@ -217,6 +218,8 @@ Api.prototype.rawQuery = function () {
  * @private
  */
 Api._saveQueryData = function (savePath, q, req, res) {
+  // Create sub directories if they don't exist
+  mkdirp.sync(savePath);
   // Save backup req and response as timestamp.json
   var qDate = moment(q.date).format('MM-DD-YY');
   var currDate = moment().format('MM-DD-YY_h:mm:ssa');

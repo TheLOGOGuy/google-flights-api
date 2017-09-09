@@ -61,7 +61,7 @@ Instantiates the object for interacting with Google QPX API
 | --- | --- | --- | --- |
 | apikey | <code>String</code> |  | QPX api key |
 | [options] | <code>Object</code> | <code>{}</code> | Optional parameters |
-| [options.backup] | <code>String</code> | <code>false</code> | Absolute path for location to save full query response and request in JSON |
+| [options.backup] | <code>String</code> | <code>false</code> | Absolute path for location to save full query response and request in JSON                                                Backup filename = MM-DD-YY__origin__destination__current-date.json |
 
 <a name="Api+query"></a>
 
@@ -112,7 +112,6 @@ Perform a Google QPX query, no processing will be done on the query or response 
 **See**
 
 - https://developers.google.com/qpx-express/v1/trips/search#request
-- https://developers.google.com/qpx-express/v1/trips/search#response
 - https://developers.google.com/qpx-express/v1/trips/search#response
 
 
