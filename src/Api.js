@@ -79,8 +79,8 @@ Api.prototype.query = async function query(q, cb) {
     };
 
     const queryBody = Api._getQueryBody(_.defaultsDeep(q, defaultQ));
-    const queryRequest = { method: 'POST', url: this.url, body: queryBody, json: true };
-    const queryResponse = await Api._queryPromise(queryRequest, { simple: this.options.simple });
+    const queryRequest = { method: 'POST', url: this.url, body: queryBody, json: true, simple: this.options.simple };
+    const queryResponse = await Api._queryPromise(queryRequest);
 
     if (this.options.backup) {
       Api._saveQueryData(this.options.backup, q, queryRequest, queryResponse);
@@ -118,8 +118,8 @@ Api.prototype.rawQuery = async function query(q, cb) {
     }
   }
 
-  const queryRequest = { method: 'POST', url: this.url, body: q, json: true };
-  const queryResponse = await Api._queryPromise(queryRequest, { simple: this.options.simple });
+  const queryRequest = { method: 'POST', url: this.url, body: q, json: true, simple: this.options.simple };
+  const queryResponse = await Api._queryPromise(queryRequest);
 
   if (this.options.backup) {
     Api._saveQueryData(this.options.backup, q, queryRequest, queryResponse);
@@ -154,19 +154,15 @@ Api._saveQueryData = function (savePath, q, req, res) {
 /**
  * Returns a promise which resolves to the response body
  * @param {Object} queryRequest          - The request object made to the QPX api
- * @param {Object} [options={}]          - Optional parameters
- * @param {Object} [options.simple=true] - If true will return error on invalid status code
  * @returns {Promise} Promise with query response body
  * @throws Will throw an error if request-promise fails
  * @static
  * @memberOf Api
  * @private
  */
-Api._queryPromise = async function (queryRequest, options) {
-  options = _.defaultsDeep(options, { simple: true });
-
+Api._queryPromise = async function (queryRequest) {
   try {
-    const response = await request(queryRequest, { simple: options.simple });
+    const response = await request(queryRequest);
     return response;
   } catch (e) {
     return e;

@@ -110,9 +110,9 @@ Api.prototype.query = function () {
               solutions: 500
             };
             queryBody = Api._getQueryBody(_.defaultsDeep(q, defaultQ));
-            queryRequest = { method: 'POST', url: this.url, body: queryBody, json: true };
+            queryRequest = { method: 'POST', url: this.url, body: queryBody, json: true, simple: this.options.simple };
             _context.next = 12;
-            return Api._queryPromise(queryRequest, { simple: this.options.simple });
+            return Api._queryPromise(queryRequest);
 
           case 12:
             queryResponse = _context.sent;
@@ -197,9 +197,9 @@ Api.prototype.rawQuery = function () {
             return _context2.abrupt('return', cb(_context2.t2));
 
           case 12:
-            queryRequest = { method: 'POST', url: this.url, body: q, json: true };
+            queryRequest = { method: 'POST', url: this.url, body: q, json: true, simple: this.options.simple };
             _context2.next = 15;
-            return Api._queryPromise(queryRequest, { simple: this.options.simple });
+            return Api._queryPromise(queryRequest);
 
           case 15:
             queryResponse = _context2.sent;
@@ -251,8 +251,6 @@ Api._saveQueryData = function (savePath, q, req, res) {
 /**
  * Returns a promise which resolves to the response body
  * @param {Object} queryRequest          - The request object made to the QPX api
- * @param {Object} [options={}]          - Optional parameters
- * @param {Object} [options.simple=true] - If true will return error on invalid status code
  * @returns {Promise} Promise with query response body
  * @throws Will throw an error if request-promise fails
  * @static
@@ -260,36 +258,34 @@ Api._saveQueryData = function (savePath, q, req, res) {
  * @private
  */
 Api._queryPromise = function () {
-  var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(queryRequest, options) {
+  var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(queryRequest) {
     var response;
     return _regenerator2.default.wrap(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
           case 0:
-            options = _.defaultsDeep(options, { simple: true });
+            _context3.prev = 0;
+            _context3.next = 3;
+            return request(queryRequest);
 
-            _context3.prev = 1;
-            _context3.next = 4;
-            return request(queryRequest, { simple: options.simple });
-
-          case 4:
+          case 3:
             response = _context3.sent;
             return _context3.abrupt('return', response);
 
-          case 8:
-            _context3.prev = 8;
-            _context3.t0 = _context3['catch'](1);
+          case 7:
+            _context3.prev = 7;
+            _context3.t0 = _context3['catch'](0);
             return _context3.abrupt('return', _context3.t0);
 
-          case 11:
+          case 10:
           case 'end':
             return _context3.stop();
         }
       }
-    }, _callee3, this, [[1, 8]]);
+    }, _callee3, this, [[0, 7]]);
   }));
 
-  return function (_x5, _x6) {
+  return function (_x5) {
     return _ref3.apply(this, arguments);
   };
 }();
