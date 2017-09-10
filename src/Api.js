@@ -17,9 +17,11 @@ const mkdirp = require('mkdirp');
  * @param {Object} [options = {}]               - Optional parameters
  * @param {String} [options.backup = false]     - Absolute path for location to save full query response and request in JSON
  *                                                Backup filename = MM-DD-YY__origin__destination__current-date.json
+ * @param {Boolean} [options.simple=true]       - If true, throws on invalid status codes
+ * request in JSON
  */
 function Api(apikey, options) {
-  const defaultOptions = { backup: false };
+  const defaultOptions = { backup: false, simple: true };
   this.options = _.defaultsDeep(options, defaultOptions);
   if (!apikey || typeof apikey !== 'string' || apikey.length === 0) {
     throw Error('Api class expects a valid apikey');
@@ -65,29 +67,36 @@ function Api(apikey, options) {
  *                                                @see https://developers.google.com/qpx-express/v1/trips/search#response
  */
 Api.prototype.query = async function query(q, cb) {
-  // When using callback instead of promise
-  if (cb) {
-    try {
+  try {
+    // When using callback instead of promise
+    if (cb) {
       return cb(null, await this.query(q));
-    } catch (e) {
+    }
+
+    const defaultQ = {
+      adultCount: 1,
+      solutions: 500,
+    };
+
+    const queryBody = Api._getQueryBody(_.defaultsDeep(q, defaultQ));
+    const queryRequest = { method: 'POST', url: this.url, body: queryBody, json: true };
+    const queryResponse = await Api._queryPromise(queryRequest);
+
+    if (this.options.backup) {
+      Api._saveQueryData(this.options.backup, q, queryRequest, queryResponse);
+    }
+
+    if (_.isError(queryResponse)) {
+      throw queryResponse;
+    }
+    return queryResponse;
+  } catch (e) {
+    if (cb) {
       return cb(e);
     }
+
+    throw e;
   }
-
-  const defaultQ = {
-    adultCount: 1,
-    solutions: 500,
-  };
-
-  const queryBody = Api._getQueryBody(_.defaultsDeep(q, defaultQ));
-  const queryRequest = { method: 'POST', url: this.url, body: queryBody, json: true };
-  const queryResponse = await Api._queryPromise(queryRequest);
-
-  if (this.options.backup) {
-    Api._saveQueryData(this.options.backup, q, queryRequest, queryResponse);
-  }
-
-  return queryResponse;
 };
 
 /**
@@ -153,10 +162,10 @@ Api._saveQueryData = function (savePath, q, req, res) {
  */
 Api._queryPromise = async function (queryRequest) {
   try {
-    const response = await request(queryRequest);
+    const response = await request(queryRequest, { simple: this.options.simple });
     return response;
   } catch (e) {
-    throw e;
+    return e;
   }
 };
 

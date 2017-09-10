@@ -33,9 +33,11 @@ var mkdirp = require('mkdirp');
  * @param {Object} [options = {}]               - Optional parameters
  * @param {String} [options.backup = false]     - Absolute path for location to save full query response and request in JSON
  *                                                Backup filename = MM-DD-YY__origin__destination__current-date.json
+ * @param {Boolean} [options.simple=true]       - If true, throws on invalid status codes
+ * request in JSON
  */
 function Api(apikey, options) {
-  var defaultOptions = { backup: false };
+  var defaultOptions = { backup: false, simple: true };
   this.options = _.defaultsDeep(options, defaultOptions);
   if (!apikey || typeof apikey !== 'string' || apikey.length === 0) {
     throw Error('Api class expects a valid apikey');
@@ -87,12 +89,13 @@ Api.prototype.query = function () {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
+            _context.prev = 0;
+
             if (!cb) {
-              _context.next = 12;
+              _context.next = 7;
               break;
             }
 
-            _context.prev = 1;
             _context.t0 = cb;
             _context.next = 5;
             return this.query(q);
@@ -101,22 +104,17 @@ Api.prototype.query = function () {
             _context.t1 = _context.sent;
             return _context.abrupt('return', (0, _context.t0)(null, _context.t1));
 
-          case 9:
-            _context.prev = 9;
-            _context.t2 = _context['catch'](1);
-            return _context.abrupt('return', cb(_context.t2));
-
-          case 12:
+          case 7:
             defaultQ = {
               adultCount: 1,
               solutions: 500
             };
             queryBody = Api._getQueryBody(_.defaultsDeep(q, defaultQ));
             queryRequest = { method: 'POST', url: this.url, body: queryBody, json: true };
-            _context.next = 17;
+            _context.next = 12;
             return Api._queryPromise(queryRequest);
 
-          case 17:
+          case 12:
             queryResponse = _context.sent;
 
 
@@ -124,14 +122,36 @@ Api.prototype.query = function () {
               Api._saveQueryData(this.options.backup, q, queryRequest, queryResponse);
             }
 
+            if (!_.isError(queryResponse)) {
+              _context.next = 16;
+              break;
+            }
+
+            throw queryResponse;
+
+          case 16:
             return _context.abrupt('return', queryResponse);
 
-          case 20:
+          case 19:
+            _context.prev = 19;
+            _context.t2 = _context['catch'](0);
+
+            if (!cb) {
+              _context.next = 23;
+              break;
+            }
+
+            return _context.abrupt('return', cb(_context.t2));
+
+          case 23:
+            throw _context.t2;
+
+          case 24:
           case 'end':
             return _context.stop();
         }
       }
-    }, _callee, this, [[1, 9]]);
+    }, _callee, this, [[0, 19]]);
   }));
 
   function query(_x, _x2) {
@@ -246,7 +266,7 @@ Api._queryPromise = function () {
           case 0:
             _context3.prev = 0;
             _context3.next = 3;
-            return request(queryRequest);
+            return request(queryRequest, { simple: this.options.simple });
 
           case 3:
             response = _context3.sent;
@@ -255,7 +275,7 @@ Api._queryPromise = function () {
           case 7:
             _context3.prev = 7;
             _context3.t0 = _context3['catch'](0);
-            throw _context3.t0;
+            return _context3.abrupt('return', _context3.t0);
 
           case 10:
           case 'end':

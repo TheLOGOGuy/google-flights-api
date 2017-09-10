@@ -62,6 +62,7 @@ Instantiates the object for interacting with Google QPX API
 | apikey | <code>String</code> |  | QPX api key |
 | [options] | <code>Object</code> | <code>{}</code> | Optional parameters |
 | [options.backup] | <code>String</code> | <code>false</code> | Absolute path for location to save full query response and request in JSON                                                Backup filename = MM-DD-YY__origin__destination__current-date.json |
+| [options.simple] | <code>Boolean</code> | <code>true</code> | If true, throws on invalid status codes request in JSON |
 
 <a name="Api+query"></a>
 
