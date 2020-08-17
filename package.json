@@ -26,7 +26,7 @@
   "homepage": "https://github.com/danielyaa5/google-flights-api#README",
   "dependencies": {
     "babel-runtime": "^6.26.0",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.20",
     "mkdirp": "^0.5.1",
     "moment": "^2.18.1",
     "request": "^2.75.0",
